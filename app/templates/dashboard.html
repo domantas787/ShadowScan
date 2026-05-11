@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — ShadowScan{% endblock %}
+
+{% block content %}
+<div class="mb-24">
+  <h2 style="font-size: 24px;">Welcome back, {{ current_user.username }}</h2>
+  <p class="text-muted mt-16">
+    Choose a learning path below to start learning about different types of cyber attacks.
+    Each path contains exercises where you'll learn how the attack works, see a live IDS
+    simulation, and test your knowledge with a quiz.
+  </p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;">
+  {% for path in paths %}
+  <a href="/path/{{ path.id }}" class="card" style="text-decoration: none; color: var(--text); transition: border-color 0.15s;">
+    <div style="font-size: 32px; margin-bottom: 12px;">{{ path.icon }}</div>
+    <h3 style="font-size: 17px; margin-bottom: 8px;">{{ path.title }}</h3>
+    <p class="text-muted text-sm" style="margin-bottom: 16px;">{{ path.description }}</p>
+
+    <div class="progress-bar mb-12">
+      <div class="progress-fill" style="width: {{ (path.completed / path.total * 100) if path.total > 0 else 0 }}%;"></div>
+    </div>
+    <p class="text-sm text-muted">{{ path.completed }} / {{ path.total }} exercises completed</p>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

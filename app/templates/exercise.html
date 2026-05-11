@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}{{ exercise.title }} — ShadowScan{% endblock %}
+
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<a href="/path/{{ exercise.path }}" class="link text-sm">← Back to {{ exercise.path|capitalize }}</a>
+
+<h2 style="font-size: 22px; margin-top: 16px; margin-bottom: 20px;">{{ exercise.title }}</h2>
+
+<!-- Tabs -->
+<div class="tabs" id="tabBar">
+  <div class="tab active" data-tab="learn" onclick="switchTab('learn')">📖 Learn</div>
+  <div class="tab" data-tab="simulate" onclick="switchTab('simulate')">🔬 Simulate</div>
+  <div class="tab" data-tab="quiz" onclick="switchTab('quiz')">📝 Quiz</div>
+</div>
+
+
+<!-- LEARN TAb-->
+<div class="tab-content active" id="tab-learn">
+
+  <div class="card mb-16">
+    <h3 style="color: var(--accent); margin-bottom: 12px;">What is it?</h3>
+    <p class="text-muted" style="font-size: 15px;">{{ exercise.learn.what_is_it }}</p>
+  </div>
+
+  <div class="card mb-16">
+    <h3 style="color: var(--accent); margin-bottom: 12px;">How does it work?</h3>
+    <p class="text-muted" style="font-size: 15px;">{{ exercise.learn.how_it_works }}</p>
+  </div>
+
+  <div class="card mb-16">
+    <h3 style="color: var(--accent); margin-bottom: 12px;">What does the IDS look for?</h3>
+    <p class="text-muted" style="font-size: 15px;">{{ exercise.learn.what_ids_looks_for }}</p>
+  </div>
+
+  <div class="card mb-16">
+    <h3 style="color: var(--accent); margin-bottom: 12px;">How to defend against it</h3>
+    <ul class="learn-list">
+      {% for item in exercise.learn.how_to_defend %}<li>{{ item }}</li>{% endfor %}
+    </ul>
+  </div>
+
+  {% if exercise.learn.real_world %}
+  <div class="card">
+    <h3 style="color: var(--accent); margin-bottom: 12px;">Real-world example</h3>
+    <p class="text-muted" style="font-size: 15px;">{{ exercise.learn.real_world }}</p>
+  </div>
+  {% endif %}
+
+</div>
+
+
+<!--SIMULATE TAB-->
+<div class="tab-content" id="tab-simulate">
+
+  <!--Run button -->
+  <div class="card mb-16">
+    <h3 class="mb-12">🔬 Interactive Attack Simulation</h3>
+    <p class="text-muted text-sm mb-16">
+      Watch a <strong>{{ exercise.title|lower }}</strong> attack play out visually.
+      Packets will flow between the attacker and target, and you'll see exactly when
+      and how the IDS detects the attack.
+    </p>
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button class="btn btn-accent" id="simulateBtn" onclick="runSimulation()">
+        ▶ Start Simulation
+      </button>
+      <span id="simStatus" class="text-sm text-muted"></span>
+    </div>
+  </div>
+
+  <!-- attacker-->
+  <div class="card mb-16" id="diagramCard" style="display: none;">
+    <h3 class="mb-12">Network Activity</h3>
+    <div id="networkDiagram" style="position: relative; height: 180px; background: var(--bg); border-radius: var(--radius); overflow: hidden;">
+
+      <div id="attackerBox" style="position: absolute; left: 30px; top: 50%; transform: translateY(-50%); text-align: center;">
+        <div style="font-size: 40px;">💻</div>
+        <div style="font-size: 11px; color: var(--red); font-weight: 600;" id="attackerLabel">Attacker</div>
+        <div style="font-size: 10px; color: var(--muted); font-family: monospace;" id="attackerIp">--</div>
+      </div>
+
+      <div id="targetBox" style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); text-align: center;">
+        <div style="font-size: 40px;">🖥️</div>
+        <div style="font-size: 11px; color: var(--cyan); font-weight: 600;" id="targetLabel">Target</div>
+        <div style="font-size: 10px; color: var(--muted); font-family: monospace;" id="targetIp">--</div>
+      </div>
+
+      <!-- IDS shield-->
+      <div id="idsShield" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); opacity: 0; transition: opacity 0.3s;">
+        <div style="font-size: 48px;">🛡️</div>
+        <div style="font-size: 11px; color: var(--green); font-weight: 700; text-align: center;">IDS</div>
+      </div>
+
+      <!-- packets get appended here by JS -->
+      <div id="packetLayer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;"></div>
+
+    </div>
+  </div>
+
+  <!-- intensity chart -->
+  <div class="card mb-16" id="chartCard" style="display: none;">
+    <h3 class="mb-12">Attack Intensity Timeline</h3>
+    <div style="position: relative; height: 180px;">
+      <canvas id="intensityChart"></canvas>
+    </div>
+  </div>
+
+  <!-- step by step narration -->
+  <div class="card mb-16" id="narrationCard" style="display: none;">
+    <h3 class="mb-12">What's Happening</h3>
+    <div id="narrationFeed" style="font-family: monospace; font-size: 13px; line-height: 1.9;"></div>
+  </div>
+
+  <!-- alerts list-->
+  <div id="alertSection" style="display: none;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+      <h3>🚨 IDS Alerts (<span id="alertCount">0</span>)</h3>
+    </div>
+    <div id="alertResults"></div>
+  </div>
+
+  <!-- previous run results-->
+  {% if alerts %}
+  <div id="previousAlerts">
+    <h3 class="mb-12">Previous Simulation Results ({{ alerts|length }} alerts)</h3>
+    {% for alert in alerts %}
+    <div class="card mb-12" style="border-left: 3px solid {% if alert.severity >= 5 %}var(--red){% elif alert.severity >= 4 %}var(--orange){% elif alert.severity >= 3 %}var(--yellow){% else %}var(--green){% endif %};">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+        <strong>{{ alert.alert_type }}</strong>
+        <div style="display: flex; gap: 6px;">
+          <span class="sev sev-{{ alert.severity }}">Severity {{ alert.severity }}</span>
+          <span class="method method-{{ alert.detection_method }}">{{ alert.detection_method }}</span>
+        </div>
+      </div>
+      <p class="text-muted text-sm">{{ alert.description }}</p>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>
+
+
+<!--QUIZ TAB -->
+<div class="tab-content" id="tab-quiz">
+  <div class="card">
+    <h3 class="mb-16">Test Your Knowledge</h3>
+
+    {% if progress and progress.completed %}
+    <div class="flash flash-success mb-16">
+      You've already completed this quiz! Score: {{ progress.quiz_score }} / {{ exercise.quiz|length }}
+    </div>
+    {% endif %}
+
+    <div id="quizForm">
+      {% for q in exercise.quiz %}
+      {% set qindex = loop.index0 %}
+      <div class="mb-20">
+        <p style="font-size: 15px; font-weight: 500; margin-bottom: 10px;">
+          {{ loop.index }}. {{ q.question }}
+        </p>
+        {% for option in q.options %}
+        <label style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; cursor: pointer; border-radius: var(--radius); margin-bottom: 4px;"
+               onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background='transparent'">
+          <input type="radio" name="q{{ qindex }}" value="{{ loop.index0 }}" />
+          <span class="text-muted" style="font-size: 14px;">{{ option }}</span>
+        </label>
+        {% endfor %}
+      </div>
+      {% endfor %}
+
+      <button class="btn btn-accent" onclick="submitQuiz()">Submit Answers</button>
+    </div>
+
+    <div id="quizResults" style="display: none;"></div>
+  </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<!--template data to the external JS file -->
+<script>
+  const EXERCISE_ID = "{{ exercise_id }}";
+  const QUIZ_DATA = {{ exercise.quiz | tojson }};
+</script>
+<script src="{{ url_for('static', filename='js/exercise.js') }}"></script>
+{% endblock %}

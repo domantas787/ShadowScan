@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ path.title }} — ShadowScan{% endblock %}
+
+{% block content %}
+<a href="/" class="link text-sm">← Back to Dashboard</a>
+
+<div class="mb-24" style="margin-top: 16px;">
+  <h2 style="font-size: 24px;">{{ path.icon }} {{ path.title }}</h2>
+  <p class="text-muted mt-16">{{ path.description }}</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px;">
+  {% for ex in exercises %}
+  {% set prog = progress.get(ex.id, {}) %}
+  {% set is_done = prog.get('completed', 0) %}
+  <a href="/exercise/{{ ex.id }}" class="card" style="text-decoration: none; color: var(--text); display: flex; align-items: center; gap: 16px; transition: border-color 0.15s;">
+
+    <!-- Completion indicator -->
+    <div style="width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px;
+      {% if is_done %}background: rgba(34,197,94,0.15); border: 2px solid var(--green);{% else %}background: var(--surface2); border: 2px solid var(--border);{% endif %}">
+      {% if is_done %}✓{% else %}{{ loop.index }}{% endif %}
+    </div>
+
+    <div style="flex: 1;">
+      <h3 style="font-size: 15px; margin-bottom: 4px;">{{ ex.title }}</h3>
+      <p class="text-muted text-sm">{{ ex.learn.what_is_it[:100] }}...</p>
+    </div>
+
+    {% if is_done %}
+    <span class="text-sm" style="color: var(--green);">Quiz: {{ prog.get('quiz_score', 0) }}/{{ ex.quiz|length }}</span>
+    {% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}

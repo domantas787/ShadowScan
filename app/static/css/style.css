@@ -1,0 +1,309 @@
+
+:root {
+  --bg: #0f1117;
+  --surface: #1a1d27;
+  --surface2: #242733;
+  --border: #2e3144;
+  --text: #e2e4ed;
+  --muted: #8b8fa3;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --green: #22c55e;
+  --yellow: #eab308;
+  --orange: #f97316;
+  --red: #ef4444;
+  --cyan: #06b6d4;
+  --radius: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* nav bar at the top */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  height: 54px;
+  gap: 20px;
+}
+nav .logo {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+}
+nav .logo span { color: var(--text); }
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: var(--radius);
+}
+nav a:hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+nav .spacer { flex: 1; }
+nav .user { font-size: 13px; color: var(--muted); }
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* generic card layout */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+
+/* buttons */
+.btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface2);
+  color: var(--text);
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover { background: var(--border); }
+.btn-accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.btn-accent:hover { background: var(--accent2); }
+.btn-green {
+  background: var(--green);
+  border-color: var(--green);
+  color: #000;
+}
+.btn-sm { padding: 5px 12px; font-size: 13px; }
+
+/* severity badges colour coded 1 (low) to 5 (critical) */
+.sev {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.sev-1, .sev-2 { background: rgba(34,197,94,0.15); color: var(--green); }
+.sev-3 { background: rgba(234,179,8,0.15); color: var(--yellow); }
+.sev-4 { background: rgba(249,115,22,0.15); color: var(--orange); }
+.sev-5 { background: rgba(239,68,68,0.15); color: var(--red); }
+
+/* detection method badges */
+.method {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+.method-signature { background: rgba(6,182,212,0.15); color: var(--cyan); }
+.method-heuristic { background: rgba(234,179,8,0.15); color: var(--yellow); }
+.method-ml { background: rgba(99,102,241,0.15); color: var(--accent); }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th {
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* login/register form inputs */
+.form-group { margin-bottom: 16px; }
+.form-group label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.form-group input {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 14px;
+}
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* flash messages */
+.flash {
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+.flash-error {
+  background: rgba(239,68,68,0.15);
+  color: var(--red);
+  border: 1px solid rgba(239,68,68,0.3);
+}
+.flash-success {
+  background: rgba(34,197,94,0.15);
+  color: var(--green);
+  border: 1px solid rgba(34,197,94,0.3);
+}
+
+/* tabs on the exercise page */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 20px;
+}
+.tab {
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+.tab:hover { color: var(--text); }
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* progress bars on dashboard */
+.progress-bar {
+  background: var(--surface2);
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--green);
+  border-radius: 4px;
+  transition: width 0.3s;
+}
+
+/* spacing */
+.mb-12 { margin-bottom: 12px; }
+.mb-16 { margin-bottom: 16px; }
+.mb-20 { margin-bottom: 20px; }
+.mb-24 { margin-bottom: 24px; }
+.mt-16 { margin-top: 16px; }
+
+h2 { font-size: 20px; font-weight: 600; }
+
+a.link {
+  color: var(--accent);
+  text-decoration: none;
+}
+a.link:hover { text-decoration: underline; }
+
+.text-muted { color: var(--muted); }
+.text-sm { font-size: 13px; }
+
+/* the bullet list used in the Learn tab */
+.learn-list {
+  list-style: none;
+  padding: 0;
+}
+.learn-list li {
+  padding: 6px 0 6px 18px;
+  position: relative;
+  color: var(--muted);
+  font-size: 14px;
+}
+.learn-list li::before {
+  content: "›";
+  position: absolute;
+  left: 2px;
+  color: var(--accent);
+  font-weight: bold;
+}
+
+/* simulation page styles */
+
+/* animated packets flying across the screen */
+@keyframes packetFly {
+  from { left: 95px; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  to { left: calc(100% - 105px); opacity: 0; }
+}
+
+.packet {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  animation: packetFly 2s linear forwards;
+  box-shadow: 0 0 8px currentColor;
+}
+
+@keyframes alertSlideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.alert-animated {
+  animation: alertSlideIn 0.3s ease forwards;
+}
+
+@keyframes narrationFade {
+  from { opacity: 0; transform: translateX(-10px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.narration-line {
+  animation: narrationFade 0.4s ease forwards;
+  padding: 4px 0;
+}
+
+/* IDS shield pulses when detection happens */
+@keyframes pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.2); }
+}
+.shield-active {
+  opacity: 1 !important;
+  animation: pulse 0.6s ease 3;
+}
